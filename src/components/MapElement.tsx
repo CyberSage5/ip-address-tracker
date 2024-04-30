@@ -4,49 +4,47 @@ import { IpQuery } from '../App';
 import useIpData from '../hooks/useIpData';
 import { useEffect } from 'react';
 
-import marker from '../assets/icon-location.svg'
+import marker from '../assets/icon-location.svg';
 
 export interface IpQueryProp {
-	ipQuery: IpQuery;
-}
-
-interface LatLng {
-	lat: number;
-	lng: number;
+  ipQuery: IpQuery;
 }
 
 const myIcon = new L.Icon({
-    iconUrl: marker,
-    iconRetinaUrl: marker,
-    popupAnchor:  [-0, -0],
-    iconSize: [32,45],     
-})
+  iconUrl: marker,
+  iconRetinaUrl: marker,
+  popupAnchor: [-0, -0],
+  iconSize: [32, 45],
+});
 
 const Map = ({ ipQuery }: IpQueryProp) => {
-	const { center } = useIpData(ipQuery);
+  const { center } = useIpData(ipQuery);
 
-	const RecenterAutomatically = ({lat, lng}: LatLng) => {
-		const map = useMap();
-		 useEffect(() => {
-		   map.setView([lat, lng])
-		 }, [lat, lng]);
-		 return null;
-	   }
+  const RecenterAutomatically = () => {
+    const map = useMap();
+    useEffect(() => {
+      if (center) {
+        map.setView(center);
+      }
+    }, [center]);
+    return null;
+  };
 
-	if (!center) return <p></p>
+  if (!center) return <p>Loading...</p>; // Optional fallback message
 
-	return (
-		<div className='h-[60%] w-full absolute bottom-0 z-0'>
-			<MapContainer center={center} zoom={13} scrollWheelZoom={true}>
-				<TileLayer
-					attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-					url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-				/>
-				<Marker position={center} icon={myIcon}></Marker>
-				<RecenterAutomatically lat={center[0]} lng={center[1]} />
-			</MapContainer>
-		</div>
-	);
+  return (
+    <div className="h-[60%] w-full absolute bottom-0 z-0">
+      <MapContainer center={center} zoom={13} scrollWheelZoom={true}>
+        <TileLayer
+          attribution="&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors"
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        <Marker position={center} icon={myIcon} />
+        <RecenterAutomatically />
+      </MapContainer>
+    </div>
+  );
 };
 
 export default Map;
+
